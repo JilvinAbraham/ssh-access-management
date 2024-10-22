@@ -1,5 +1,4 @@
 # Ignore all Terraform files
-*.tf
 .terraform/
 **/.terraform/
 **/terraform*
