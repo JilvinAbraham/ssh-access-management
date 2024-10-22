@@ -18,5 +18,6 @@ Before running the playbook, ensure that you have the following:
 ## Steps
     
     - Update the inventory file with the IP address of VM
-    - Run the playbook to install and run vault dev server on VM
+    - Run the playbook vault_dev.yml to install and run vault dev server on VM
     - Use "http://<server-ip>:8200" to access vault UI
+    - Run the playbook host_configure.yml to configure host machine after terraform has configured the vault
