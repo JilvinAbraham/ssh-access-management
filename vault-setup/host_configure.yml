@@ -3,7 +3,7 @@
   hosts: host_servers
   become: true  # Run tasks with elevated privileges
   vars:
-    vault_address: "http://192.168.0.106:8200"  # Replace with your Vault address
+    vault_address: "http://192.168.0.109:8200"  # Replace with your Vault address
     vault_token: "root"  # Replace with your Vault token
     ssh_ca_path: "ssh"  # Vault path to the SSH CA public key
     ca_cert_path: /etc/ssh/ca_cert.pem

@@ -45,13 +45,12 @@
         mode: '0755'
 
     - name: Start Vault in dev mode
-      shell: |
-        nohup vault server -dev -dev-listen-address={{ vault_listen_address }} -dev-root-token-id="root" &
+      command: vault server -dev -dev-listen-address={{ vault_listen_address }} -dev-root-token-id="root" &
       environment:
         VAULT_ADDR: "http://{{ vault_listen_address }}"
       args:
         chdir: "{{ vault_config_dir }}"
-      async: 120  # Allow task to run in the background
+      async: 99999999  # Allow task to run in the background indefinetly
       poll: 0
       when: "'vault_server' in group_names"
 
