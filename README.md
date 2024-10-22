@@ -2,7 +2,7 @@
 
 ## Objective
 
-The **SSH Access Management System** aims to provide a secure, automated solution for granting and revoking time-limited SSH access to developers in an organization. This system leverages Jenkins for key generation and automation, ensuring that developers can request temporary access to specific servers without compromising security. By automating the process of SSH key creation, public key deployment, and access revocation, the system addresses the challenges of manual access management, improves security, and ensures compliance with organizational access control policies.
+The **SSH Access Management System** aims to provide a secure, automated solution for granting and revoking time-limited SSH access to developers in an organization. This system leverages Hashicorp Vault for key generation Ansible and Terraform for automation, ensuring that developers can request temporary access to specific servers without compromising security. By automating the process of SSH key creation, public key deployment, and access revocation, the system addresses the challenges of manual access management, improves security, and ensures compliance with organizational access control policies.
 
 ## Problems Solved
 
@@ -23,6 +23,16 @@ The **SSH Access Management System** aims to provide a secure, automated solutio
 
 6. **User Convenience**: 
    - Provides an easy-to-use interface through Jenkins, enabling developers to request access on-demand without complex procedures or delays.
+
+## Setup
+
+1. Multipass to Launch Servers - [Dev, Vault, Host]
+2. Ansible to setup Vault in Server and run in server mode
+3. Terraform to configure the vault to launch secret engines and create users
+4. Ansible to configure host machine to support certs created by vault
+5. Dev Server which act as client machine which will try to access the host machines by signing their private keys using keys provided by vault.
+
+There is README.md file in each module which explains how to configure and setup the infra required and steps to follow.
 
 
 
