@@ -1,6 +1,6 @@
 ---
 - name: Setup and start Vault in dev mode on VM
-  hosts: vault_server
+  hosts: all
   become: yes  # Run tasks as root
   vars:
     vault_version: "1.14.1"  # Replace with the desired Vault version
@@ -53,6 +53,7 @@
         chdir: "{{ vault_config_dir }}"
       async: 120  # Allow task to run in the background
       poll: 0
+      when: "'vault_server' in group_names"
 
     - name: Ensure Vault is running
       shell: curl -s {{ vault_listen_address }}/v1/sys/health
@@ -60,3 +61,4 @@
       retries: 5
       delay: 5
       until: vault_health_check.rc == 0
+      when: "'vault_server' in group_names"
