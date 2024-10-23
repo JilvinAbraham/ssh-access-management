@@ -1,0 +1,8 @@
+[vault_server]
+192.168.0.109 ansible_user=ubuntu
+
+[host_servers]
+192.168.0.108 ansible_user=ubuntu
+
+[dev_servers]
+192.168.0.107 ansible_user=ubuntu

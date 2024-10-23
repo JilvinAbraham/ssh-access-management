@@ -1,0 +1,39 @@
+---
+- name: Fetch Vault SSH CA public key and configure SSH
+  hosts: host_servers
+  become: true  # Run tasks with elevated privileges
+  vars:
+    vault_address: "http://192.168.0.109:8200"  # Replace with your Vault address
+    vault_token: "root"  # Replace with your Vault token
+    ssh_ca_path: "ssh"  # Vault path to the SSH CA public key
+    ca_cert_path: /etc/ssh/ca_cert.pem
+
+  tasks:
+    - name: Fetch Vault SSH CA public key using Vault API
+      uri:
+        url: "{{ vault_address }}/v1/{{ ssh_ca_path }}/public_key"
+        method: GET
+        headers:
+          X-Vault-Token: "{{ vault_token }}"
+        return_content: yes
+      register: vault_ssh_ca_response
+
+    - name: Save the SSH CA public key to /etc/ssh/ca_cert.pem
+      copy:
+        content: "{{ vault_ssh_ca_response.content }}"
+        dest: "{{ ca_cert_path }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Update sshd_config to include TrustedCAUserKeys
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^TrustedUserCAKeys'
+        line: "TrustedUserCAKeys {{ ca_cert_path }}"
+        state: present
+
+    - name: Restart SSH service
+      service:
+        name: ssh
+        state: restarted

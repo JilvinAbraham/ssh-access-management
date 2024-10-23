@@ -1,0 +1,63 @@
+---
+- name: Setup and start Vault in dev mode on VM
+  hosts: all
+  become: yes  # Run tasks as root
+  vars:
+    vault_version: "1.14.1"  # Replace with the desired Vault version
+    vault_bin_path: "/usr/local/bin/vault"
+    vault_data_dir: "/opt/vault/data"
+    vault_config_dir: "/etc/vault.d"
+    vault_listen_address: "0.0.0.0:8200"
+  
+  tasks:
+    - name: Ensure necessary dependencies are installed
+      apt:
+        name: 
+          - unzip
+          - curl
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Download Vault binary
+      get_url:
+        url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+        dest: /tmp/vault.zip
+      when: vault_bin_path is not file
+
+    - name: Unzip Vault binary
+      unarchive:
+        src: /tmp/vault.zip
+        dest: /usr/local/bin/
+        remote_src: yes
+        mode: '0755'
+      when: vault_bin_path is not file
+
+    - name: Create Vault config directory
+      file:
+        path: "{{ vault_config_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create Vault data directory
+      file:
+        path: "{{ vault_data_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Start Vault in dev mode
+      command: vault server -dev -dev-listen-address={{ vault_listen_address }} -dev-root-token-id="root" &
+      environment:
+        VAULT_ADDR: "http://{{ vault_listen_address }}"
+      args:
+        chdir: "{{ vault_config_dir }}"
+      async: 99999999  # Allow task to run in the background indefinetly
+      poll: 0
+      when: "'vault_server' in group_names"
+
+    - name: Ensure Vault is running
+      shell: curl -s {{ vault_listen_address }}/v1/sys/health
+      register: vault_health_check
+      retries: 5
+      delay: 5
+      until: vault_health_check.rc == 0
+      when: "'vault_server' in group_names"
